@@ -32,6 +32,7 @@ function invokeResponseSet(evt) {
   }
   console.log(params);
   renderImages(params);
+  createSimpleLightBox();
   loadMoreBtn.hidden = false;
   // console.log(imageListRef.firstElementChild);
   // const { height: cardHeight } = document
@@ -41,7 +42,6 @@ function invokeResponseSet(evt) {
   //   top: cardHeight * 2,
   //   behavior: 'smooth',
   // });
-  createSimpleLightBox();
 }
 function appendMarkup(imageData) {
   imageListRef.insertAdjacentHTML('beforeend', createMarkup(imageData));
@@ -74,7 +74,7 @@ function createMarkup(imageData) {
   console.log(imageData);
   return imageData.hits
     .map(
-      image => `<a href="${image.largeImageURL}" class="photo-card"><img src="${image.webformatURL}" alt="${image.tags}" loading="lazy" height="200" />
+      image => `<div class='photo-card'><a href="${image.largeImageURL}"><img src="${image.webformatURL}" alt="${image.tags}" loading="lazy" height="200" /></a>
   <div class="info">
     <p class="info-item">
       <b>Likes</b>
@@ -93,18 +93,14 @@ function createMarkup(imageData) {
       ${image.downloads}
     </p>
   </div>
-</a>`
+  </div>
+`
     )
     .join('');
 }
 function createSimpleLightBox() {
-  let gallery = new SimpleLightbox('.gallery a');
-  gallery.on('show.simplelightbox', function () {
-    gallery.defaultOptions.captionsData = 'alt';
-    gallery.defaultOptions.captionDelay = 250;
-  });
-
-  gallery.on('error.simplelightbox', function (e) {
-    console.log(e);
+  new SimpleLightbox('.photo-card a', {
+    captionsData: 'alt',
+    captionDelay: 250,
   });
 }

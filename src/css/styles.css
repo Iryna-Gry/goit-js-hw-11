@@ -82,6 +82,9 @@ p {
   color: black;
 
 }
+.photo-card a {
+  width: 100%;
+}
 .info {
   margin: 0;
   display: flex;
