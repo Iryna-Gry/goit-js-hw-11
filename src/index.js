@@ -1,13 +1,16 @@
 import './css/styles.css';
 import fetchImages from './fetchImages.js';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
+import SimpleLightbox from 'simplelightbox';
+import 'simplelightbox/dist/simple-lightbox.min.css';
 const DEBOUNCE_DELAY = 300;
-
 // const inputRef = document.getElementById('search-box');
 const imageListRef = document.querySelector('div.gallery');
 const formRef = document.getElementById('search-form');
 const loadMoreBtn = document.querySelector('.load-more');
-let request = '';
+
+loadMoreBtn.hidden = true;
+
 let page = 1;
 let perPage = 40;
 const params = {
@@ -29,6 +32,16 @@ function invokeResponseSet(evt) {
   }
   console.log(params);
   renderImages(params);
+  loadMoreBtn.hidden = false;
+  // console.log(imageListRef.firstElementChild);
+  // const { height: cardHeight } = document
+  //   .querySelector('div.gallery')
+  //   .firstElementChild.getBoundingClientRect();
+  // window.scrollBy({
+  //   top: cardHeight * 2,
+  //   behavior: 'smooth',
+  // });
+  createSimpleLightBox();
 }
 function appendMarkup(imageData) {
   imageListRef.insertAdjacentHTML('beforeend', createMarkup(imageData));
@@ -61,8 +74,7 @@ function createMarkup(imageData) {
   console.log(imageData);
   return imageData.hits
     .map(
-      image => `<div class="photo-card">
-  <img src="${image.webformatURL}" alt="${image.tags}" loading="lazy" height="200" />
+      image => `<a href="${image.largeImageURL}" class="photo-card"><img src="${image.webformatURL}" alt="${image.tags}" loading="lazy" height="200" />
   <div class="info">
     <p class="info-item">
       <b>Likes</b>
@@ -81,7 +93,18 @@ function createMarkup(imageData) {
       ${image.downloads}
     </p>
   </div>
-</div>`
+</a>`
     )
     .join('');
+}
+function createSimpleLightBox() {
+  let gallery = new SimpleLightbox('.gallery a');
+  gallery.on('show.simplelightbox', function () {
+    gallery.defaultOptions.captionsData = 'alt';
+    gallery.defaultOptions.captionDelay = 250;
+  });
+
+  gallery.on('error.simplelightbox', function (e) {
+    console.log(e);
+  });
 }
