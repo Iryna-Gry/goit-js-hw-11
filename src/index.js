@@ -8,11 +8,16 @@ const DEBOUNCE_DELAY = 300;
 const imageListRef = document.querySelector('div.gallery');
 const formRef = document.getElementById('search-form');
 const loadMoreBtn = document.querySelector('.load-more');
+const loadContainerRef = document.querySelector('div.button-container');
 
 loadMoreBtn.hidden = true;
 let page = 1;
 let perPage = 40;
-let gallery;
+let totalPages = 1;
+let gallery = new SimpleLightbox('.photo-card a', {
+  captionDelay: 250,
+});
+let pagesLeft = 1;
 const params = {
   q: '',
   image_type: 'photo',
@@ -32,29 +37,28 @@ async function invokeResponseSet(evt) {
   }
   await renderImages(params);
   createSimpleLightBox();
-  loadMoreBtn.hidden = false;
-}
-function slowScroll() {
-  const { height: cardHeight } = document
-    .querySelector('div.gallery')
-    .firstElementChild.getBoundingClientRect();
-  window.scrollBy({
-    top: cardHeight * 2,
-    behavior: 'smooth',
-  });
 }
 async function renderImages(params) {
+  console.log(pagesLeft);
   try {
     const response = await fetchImages(params);
+    if (pagesLeft === 0) {
+      loadContainerRef.innerHTML = '';
+      Notify.info("We're sorry, but you've reached the end of search results.");
+    }
     if (response.status !== 200) {
+      loadMoreBtn.hidden = true;
       return Notify.failure(
         'Sorry, there are no images matching your search query. Please try again.'
       );
     }
+    totalPages = Math.ceil(response.data.totalHits / perPage);
+    loadMoreBtn.hidden = false;
     await appendMarkup(response);
     return { data };
   } catch (error) {
     if (error.status === 404) {
+      loadMoreBtn.hidden = true;
       Notify.failure(
         'Sorry, there are no images matching your search query. Please try again.'
       );
@@ -71,11 +75,11 @@ async function appendMarkup(response) {
     );
 }
 formRef.addEventListener('submit', invokeResponseSet);
-loadMoreBtn.addEventListener('click', () => {
+loadMoreBtn.addEventListener('click', async () => {
   params.page += 1;
-  renderImages(params);
-  slowScroll();
-  gallery.refresh();
+  pagesLeft = totalPages - params.page;
+  await renderImages(params);
+  gallery.refresh('show.simplelightbox');
 });
 async function createMarkup({ data }) {
   return await data.hits
