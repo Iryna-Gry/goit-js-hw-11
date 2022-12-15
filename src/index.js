@@ -10,9 +10,9 @@ const formRef = document.getElementById('search-form');
 const loadMoreBtn = document.querySelector('.load-more');
 
 loadMoreBtn.hidden = true;
-
 let page = 1;
 let perPage = 40;
+let gallery;
 const params = {
   q: '',
   image_type: 'photo',
@@ -21,7 +21,7 @@ const params = {
   page: '',
   per_page: perPage,
 };
-function invokeResponseSet(evt) {
+async function invokeResponseSet(evt) {
   evt.preventDefault();
   imageListRef.innerHTML = '';
   page = 1;
@@ -30,49 +30,55 @@ function invokeResponseSet(evt) {
   if (params.q === '') {
     return;
   }
-  console.log(params);
-  renderImages(params);
+  await renderImages(params);
   createSimpleLightBox();
   loadMoreBtn.hidden = false;
-  // console.log(imageListRef.firstElementChild);
-  // const { height: cardHeight } = document
-  //   .querySelector('div.gallery')
-  //   .firstElementChild.getBoundingClientRect();
-  // window.scrollBy({
-  //   top: cardHeight * 2,
-  //   behavior: 'smooth',
-  // });
 }
-function appendMarkup(imageData) {
-  imageListRef.insertAdjacentHTML('beforeend', createMarkup(imageData));
+function slowScroll() {
+  const { height: cardHeight } = document
+    .querySelector('div.gallery')
+    .firstElementChild.getBoundingClientRect();
+  window.scrollBy({
+    top: cardHeight * 2,
+    behavior: 'smooth',
+  });
 }
-function renderImages(params) {
-  return fetchImages(params)
-    .then(imageData => {
-      appendMarkup(imageData);
-      if (params.page === 1)
-        return Notify.success(
-          `Hoorray! We found ${imageData.totalHits} images`
-        );
-    })
-    .catch(error => {
-      if (error.status === 404) {
-        Notify.failure(
-          'Sorry, there are no images matching your search query. Please try again.'
-        );
-        imageListRef.innerHTML = '';
-        return;
-      }
-    });
+async function renderImages(params) {
+  try {
+    const response = await fetchImages(params);
+    if (response.status !== 200) {
+      return Notify.failure(
+        'Sorry, there are no images matching your search query. Please try again.'
+      );
+    }
+    await appendMarkup(response);
+    return { data };
+  } catch (error) {
+    if (error.status === 404) {
+      Notify.failure(
+        'Sorry, there are no images matching your search query. Please try again.'
+      );
+      imageListRef.innerHTML = '';
+      return;
+    }
+  }
+}
+async function appendMarkup(response) {
+  imageListRef.insertAdjacentHTML('beforeend', await createMarkup(response));
+  if (params.page === 1)
+    return Notify.success(
+      `Hoorray! We found ${response.data.totalHits} images`
+    );
 }
 formRef.addEventListener('submit', invokeResponseSet);
 loadMoreBtn.addEventListener('click', () => {
   params.page += 1;
   renderImages(params);
+  slowScroll();
+  gallery.refresh();
 });
-function createMarkup(imageData) {
-  console.log(imageData);
-  return imageData.hits
+async function createMarkup({ data }) {
+  return await data.hits
     .map(
       image => `<div class='photo-card'><a href="${image.largeImageURL}"><img src="${image.webformatURL}" alt="${image.tags}" loading="lazy" height="200" /></a>
   <div class="info">
@@ -98,9 +104,9 @@ function createMarkup(imageData) {
     )
     .join('');
 }
+
 function createSimpleLightBox() {
-  new SimpleLightbox('.photo-card a', {
-    captionsData: 'alt',
+  gallery = new SimpleLightbox('.photo-card a', {
     captionDelay: 250,
   });
 }
