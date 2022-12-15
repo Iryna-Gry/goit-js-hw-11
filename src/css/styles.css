@@ -91,14 +91,17 @@ p {
 .photo-card a {
   width: 100%;
 }
-.info {
+.info,
+.list {
   margin: 0;
   display: flex;
   padding: 10px;
   text-align: center;
   gap: 10px;
+    list-style: none;
 }
-.info-item {
+.info-item,
+.list-item {
   font-weight: 400;
 }
 .image-container {
@@ -112,7 +115,8 @@ p {
   align-items: center;
   padding: 10px;
 }
-button.load-more {
+button.load-more,
+.list-link {
   background-color: #cb42f5;
   border: none;
   color: #fff;
@@ -120,9 +124,15 @@ button.load-more {
   padding: 8px 20px;
   border-radius: 4px;
   font-weight: 600;
+  transition: background-color 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.list-link {
+  text-decoration: none;
 }
 button.load-more:hover,
-button.load-more:focus {
+button.load-more:focus,
+.list-link:hover,
+.list-link:focus {
   background-color: rgb(255, 182, 182);
-  transition: color 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  
 }
