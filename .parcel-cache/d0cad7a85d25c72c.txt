@@ -25,7 +25,7 @@
 76D:\Projects\goit-js-hw-11\node_modules\utility-types\dist\utility-types.d.ts133154807925856159 0
 66D:\Projects\goit-js-hw-11\node_modules\source-map-js\source-map.js133154807912162072 0
 63D:\Projects\goit-js-hw-11\node_modules\buffer-from\package.json133154807889684508 0
-59D:\Projects\goit-js-hw-11\src\partials\infinite-scroll.html133155915931364210 0
+59D:\Projects\goit-js-hw-11\src\partials\infinite-scroll.html133155923400061039 0
 78D:\Projects\goit-js-hw-11\node_modules\utility-types\dist\utility-types.js.map133154807913032065 0
 72D:\Projects\goit-js-hw-11\node_modules\@parcel\utils\test\config.test.js133154807911382065 0
 117D:\Projects\goit-js-hw-11\node_modules\@parcel\node-resolver-core\test\fixture\node_modules\package-fallback\index.js133154807940998837 0
